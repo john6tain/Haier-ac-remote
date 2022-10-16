@@ -4,6 +4,7 @@
 #include <ESP8266HTTPClient.h>
 #include <IRac.h>
 #include <IRutils.h>
+#include <WiFiClientSecure.h>
 
 IRac ac(4);
 
@@ -11,7 +12,7 @@ IRac ac(4);
 const char* ssid     = "SSID_NAME";
 const char* password = "PASSWORD";
 
-WiFiClient client;
+WiFiClientSecure client;
 HTTPClient http;
 
 int degrees = 25;
@@ -113,15 +114,16 @@ void checkResponse(String response) {
 
 }
 void loop() {
+    client.setInsecure(); //the magic line, use with caution
+    client.connect("https:localhost", 443);
+  if (http.begin(client, "https://localhost/get/command")) { // HTTP/HTTPS  with fingerprint
 
-  if (http.begin(client, "http://192.168.1.6:8888/get/command")) { // HTTP
 
-
-    //    Serial.print("[HTTP] GET...\n");
+//        Serial.print("[HTTPS] GET...\n");
     int httpCode = http.GET();
 
     if (httpCode > 0) {
-      //      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+//            Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
 
       // file found at server
       if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
