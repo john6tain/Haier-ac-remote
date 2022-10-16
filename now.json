@@ -4,7 +4,7 @@
     "src": "./index.js",
     "use": "@now/node-server"
   }],
-  "routes": [{"/": "root"},
+  "routes": [{"handle": "filesystem"},
     {
       "src": "/.*",
       "dest": "index.js"
