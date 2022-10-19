@@ -107,8 +107,7 @@
 				if (autoBtn.classList.contains('button2')) {
 			
 					httpGet('AUTO0');
-					//httpGet('OFF');
-					clearInterval(autoInterval);
+					checkForAuto();
 					autoBtn.classList.remove('button2');
 				}else {
 					checkForAuto();
@@ -140,6 +139,7 @@
 			function checkForAuto(){
 				autoInterval = setInterval(()=>{
 					if(Number(temperature.textContent) >=Number(degrees.textContent)){
+						clearInterval(autoInterval);
 						if(onBtn.textContent === 'OFF') {
 							httpGet('OFF');
 							onBtn.textContent = ('ON');
