@@ -11,8 +11,9 @@
 			.digits {padding-top: 5%;font-size: x-large;}
 			.main {border: 1px solid rgb(0,0,0);margin: 0 35%;}
 			.row {margin: 5% 0px 5%;}
-			.counters {display: inline;padding-left: 40%;}
-			.bar {color: #195B6A;}
+			.counter1 {display: inline;padding-left: 40%;}
+			.counter2 {display: inline;padding-left: 30%;}
+			.bar,i {color: #195B6A;}
 			#display {background-color: rgb(142 148 149);color: rgb(255,255,255);padding-bottom: 10%;margin: 0 6%;padding-top: 5%;}
 			@media (pointer:none), (pointer:coarse){.main {margin: 0 0;border:none}}
 			</style>
@@ -24,15 +25,15 @@
 		<div id="display">
 			<div>
 				<em>FAN: </em><b class="bar">auto</b>
-				<div class="counters">
+				<div class="counter1">
 					<em>MODE: </em><b class="bar">auto</b>
 				</div>
 			</div>
 			<div class="digits">	<b>26</b>  &#8451	</div>
 			<div>
-				<em>Humidity: </em><b class="bar">60</b>
-				<div class="counters">
-					<em>Temp: </em><b class="bar">25</b>
+				<em>Humidity: </em><b class="bar">60</b> <i>%</i>
+				<div class="counter2">
+					<em>Temp: </em><b class="bar">25</b><i>&#8451</i>
 				</div>
 			</div>
 		</div>
@@ -52,7 +53,6 @@
 	<div>
 </body>
 	<script>
-	
 			const onBtn = document.querySelector('#onBtn');
 			const plusBtn = document.querySelector('#plusBtn');
 			const minusBtn = document.querySelector('#minusBtn');
@@ -63,15 +63,15 @@
 			const modeType = document.querySelectorAll('.bar')[1];
 			const humidity = document.querySelectorAll('.bar')[2];
 			const temperature = document.querySelectorAll('.bar')[3];
-			
+
 			function reloadState(){
 				buttonState = JSON.parse(httpGet('','/get/state'));
 				
 				degrees.textContent = buttonState.degrees;
 				fanSpeed.textContent = buttonState.fanSpeed;
 				modeType.textContent = buttonState.modeType;
-				humidity.textContent = `${buttonState.humidity}%`;
-				temperature.textContent = `${buttonState.temperature}&#8451`;
+				humidity.textContent = `${buttonState.humidity}`;
+				temperature.textContent = `${buttonState.temperature}`;
 				
 				onBtn.textContent = buttonState.on && 'ON' || 'OFF';
 				buttonState.on ? onBtn.classList.remove('button2') : onBtn.classList.add('button2');
