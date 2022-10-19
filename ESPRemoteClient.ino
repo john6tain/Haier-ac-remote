@@ -5,11 +5,16 @@
 #include <IRac.h>
 #include <IRutils.h>
 #include <WiFiClientSecure.h>
+#include "DHT.h"
+
+
+#define DHTTYPE DHT11 
+
 
 IRac ac(4);
 
 // Replace with your network credentials
-const char* ssid     = "SSID_NAME";
+const char* ssid     = "SSID";
 const char* password = "PASSWORD";
 
 WiFiClientSecure client;
@@ -20,8 +25,12 @@ String fanSpeed = "auto";
 String modeType = "Heat";
 
 
-const int output5 = 5;
-const int output4 = 4;
+const int DHTPin = 14; // D5
+const int output4 = 4; // D2
+
+//uint8_t DHTPin = D5; 
+
+DHT dht(DHTPin, DHT11); 
 
 void setupAC() {
   ac.next.protocol = decode_type_t::HAIER_AC;  // Set a protocol to use.
@@ -47,9 +56,10 @@ void setupAC() {
 }
 void setup() {
   Serial.begin(115200);
-
+  pinMode(DHTPin, INPUT);
   setupAC();
-
+  dht.begin();   
+  
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -113,30 +123,49 @@ void checkResponse(String response) {
   }
 
 }
-void loop() {
-    client.setInsecure(); //the magic line, use with caution
-    client.connect("https:localhost", 443);
-  if (http.begin(client, "https://localhost/get/command")) { // HTTP/HTTPS  with fingerprint
+String httpClient(String url){
+    if (http.begin(client, url)) { // HTTP/HTTPS  with fingerprint
 
-
-//        Serial.print("[HTTPS] GET...\n");
+        //        Serial.print("[HTTPS] GET...\n");
     int httpCode = http.GET();
 
     if (httpCode > 0) {
-//            Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+       //Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
 
       // file found at server
       if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
         String payload = http.getString();
         //        Serial.println(payload);
-        checkResponse(payload);
+        return payload;
       }
     } else {
       Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+
+      return "[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str();
     }
 
     http.end();
   } else {
     Serial.printf("[HTTP} Unable to connect\n");
+    return "[HTTP} Unable to connect\n";
   }
+  
+}
+
+
+void sendTempAndHumidity() {
+  float temperature;
+  float humidity;
+  temperature = dht.readTemperature(); // Gets the values of the temperature
+  humidity = dht.readHumidity(); // Gets the values of the humidity 
+
+  httpClient("https://localhost/get/sensors/"+String(temperature)+"/"+String(humidity));
+
+}
+
+void loop() {
+    client.setInsecure(); //the magic line, use with caution
+    client.connect("https://localhost", 443);
+    checkResponse(httpClient("https://localhost/get/command"));
+    sendTempAndHumidity();
 }

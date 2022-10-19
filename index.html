@@ -29,12 +29,12 @@
 				</div>
 			</div>
 			<div class="digits">	<b>26</b>  &#8451	</div>
-			<!--<div>
-				<em>Humidity: </em><b class="bar">60%</b>
+			<div>
+				<em>Humidity: </em><b class="bar">60</b>
 				<div class="counters">
-					<em>Temp: </em><b class="bar">25&#8451</b>
+					<em>Temp: </em><b class="bar">25</b>
 				</div>
-			</div>-->
+			</div>
 		</div>
 		<div class="row">
 			<button id="modeBtn" class="button">MODE</button>
@@ -61,6 +61,8 @@
 			const degrees = document.querySelector('.digits b');
 			const fanSpeed = document.querySelectorAll('.bar')[0];
 			const modeType = document.querySelectorAll('.bar')[1];
+			const humidity = document.querySelectorAll('.bar')[2];
+			const temperature = document.querySelectorAll('.bar')[3];
 			
 			function reloadState(){
 				buttonState = JSON.parse(httpGet('','/get/state'));
@@ -68,6 +70,9 @@
 				degrees.textContent = buttonState.degrees;
 				fanSpeed.textContent = buttonState.fanSpeed;
 				modeType.textContent = buttonState.modeType;
+				humidity.textContent = `${buttonState.humidity}%`;
+				temperature.textContent = `${buttonState.temperature}&#8451`;
+				
 				onBtn.textContent = buttonState.on && 'ON' || 'OFF';
 				buttonState.on ? onBtn.classList.remove('button2') : onBtn.classList.add('button2');
 			}

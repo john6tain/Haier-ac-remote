@@ -16,7 +16,9 @@ let buttonState = {
 	fanSpeed: 'Auto',
 	modeType: 'Heat',
 	modeTypes: ['Auto','Cool','Heat','Dry','Fan'],
-	on:true
+	on:true,
+	humidity: 10,
+	temperature: 25,
 }
 	
 
@@ -33,6 +35,12 @@ app.get('/send/:command',(req,res)=>{
 	//console.log(req.params.command);
 	//console.log(response);
 	return res.send("command send!");
+});
+
+app.get('/get/sensors/:temperature/:humidity',(req,res)=>{
+	buttonState.temperature = req.params.temperature;
+	buttonState.humidity = req.params.humidity;
+	return res.send("sensors OK!");
 });
 
 app.get('/get/command',(req,res)=>{
