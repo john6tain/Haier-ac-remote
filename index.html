@@ -140,11 +140,11 @@
 			function checkForAuto(){
 				autoInterval = setInterval(()=>{
 					if(Number(temperature.textContent) >=Number(degrees.textContent)){
-						if(onBtn.textContent === 'ON') {
+						if(onBtn.textContent === 'OFF') {
 							httpGet('OFF');
 						}
 					}else {
-						if(onBtn.textContent === 'OFF') {
+						if(onBtn.textContent === 'ON') {
 							httpGet('ON');
 						}
 					}
