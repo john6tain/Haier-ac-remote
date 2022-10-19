@@ -107,12 +107,13 @@
 			autoBtn.addEventListener('click', () => {
 				if (autoBtn.classList.contains('button2')) {
 					httpGet('AUTO0');
+					clearInterval(autoInterval);
 					autoBtn.classList.remove('button2');
 				}else {
 					httpGet('AUTO1');
+					checkForAuto();
 					autoBtn.classList.add('button2');
 				}
-				checkForAuto();
 			});
 			
 			plusBtn.addEventListener('click', () => {
@@ -138,7 +139,7 @@
 			function checkForAuto(){
 				autoInterval = setInterval(()=>{
 					if(Number(temperature.textContent) >=Number(degrees.textContent)){
-						clearInterval(autoInterval);
+						
 						if(onBtn.textContent === 'OFF') {
 							httpGet('OFF');
 							onBtn.textContent = ('ON');
