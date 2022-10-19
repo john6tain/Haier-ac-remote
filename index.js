@@ -19,6 +19,7 @@ let buttonState = {
 	on:true,
 	humidity: 10,
 	temperature: 25,
+	auto:false,
 }
 	
 
@@ -56,6 +57,12 @@ app.get('/',(req,res)=>{
 
 function checkState(state){
 	switch (state){
+		case: "AUTO1":
+			buttonState.auto = true;
+		break;
+		case: "AUTO0":
+			buttonState.auto = false;
+		break;
 		case "ON":
 			buttonState.on = false;
 			response = 'ON';

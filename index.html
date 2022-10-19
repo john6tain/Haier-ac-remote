@@ -11,8 +11,8 @@
 			.digits {padding-top: 5%;font-size: x-large;}
 			.main {border: 1px solid rgb(0,0,0);margin: 0 35%;}
 			.row {margin: 5% 0px 5%;}
-			.counter1 {display: inline;padding-left: 40%;}
-			.counter2 {display: inline;padding-left: 20%;}
+			.counter1 {display: inline;padding-left: 25%;}
+			.counter2 {display: inline;padding-left: 25%;}
 			.bar,i {color: #195B6A;}
 			#display {background-color: rgb(142 148 149);color: rgb(255,255,255);padding-bottom: 10%;margin: 0 6%;padding-top: 5%;}
 			@media (pointer:none), (pointer:coarse){.main {margin: 0 0;border:none}}
@@ -50,10 +50,14 @@
 		<div class="row">
 			<button id="onBtn" class="button exdend">ON</button>
 		</div>
+		<div class="row">
+			<button id="autoBtn" class="button exdend">Auto</button>
+		</div>
 	<div>
 </body>
 	<script>
 			const onBtn = document.querySelector('#onBtn');
+			const autoBtn = document.querySelector('#autoBtn');
 			const plusBtn = document.querySelector('#plusBtn');
 			const minusBtn = document.querySelector('#minusBtn');
 			const modeBtn = document.querySelector('#modeBtn');
@@ -98,6 +102,18 @@
 				}
 			});
 			
+			autoBtn.addEventListener('click', () => {
+				if (autoBtn.classList.contains('button2')) {
+			
+					httpGet('AUTO0');
+					//httpGet('OFF');
+					autoBtn.classList.remove('button2');
+				}else {
+					httpGet('AUTO1');
+					autoBtn.classList.add('button2');
+				}
+			});
+			
 			plusBtn.addEventListener('click', () => {
 				httpGet('+');
 				reloadState();
@@ -117,5 +133,17 @@
 				httpGet('FAN');
 				reloadState();
 			});
+			
+			function checkForAuto(){
+				if(Number(temperature.textContent) >=Number(degrees.textContent)){
+					if(onBtn.textContent === 'ON') {
+						httpGet('OFF');
+					}
+				}else {
+					if(onBtn.textContent === 'OFF') {
+						httpGet('ON');
+					}
+				}
+			}
 	</script>
 </html>
