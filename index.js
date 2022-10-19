@@ -57,10 +57,10 @@ app.get('/',(req,res)=>{
 
 function checkState(state){
 	switch (state){
-		case: "AUTO1":
+		case "AUTO1":
 			buttonState.auto = true;
 		break;
-		case: "AUTO0":
+		case "AUTO0":
 			buttonState.auto = false;
 		break;
 		case "ON":
