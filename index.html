@@ -142,10 +142,14 @@
 					if(Number(temperature.textContent) >=Number(degrees.textContent)){
 						if(onBtn.textContent === 'OFF') {
 							httpGet('OFF');
+							onBtn.textContent = ('ON');
+					o		nBtn.classList.remove('button2');
 						}
 					}else {
 						if(onBtn.textContent === 'ON') {
 							httpGet('ON');
+							onBtn.textContent = ('OFF');
+							onBtn.classList.add('button2');
 						}
 					}
 				},15000);
