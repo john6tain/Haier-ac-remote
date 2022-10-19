@@ -67,7 +67,8 @@
 			const modeType = document.querySelectorAll('.bar')[1];
 			const humidity = document.querySelectorAll('.bar')[2];
 			const temperature = document.querySelectorAll('.bar')[3];
-
+			let autoInterval;
+			
 			function reloadState(){
 				buttonState = JSON.parse(httpGet('','/get/state'));
 				
@@ -107,8 +108,10 @@
 			
 					httpGet('AUTO0');
 					//httpGet('OFF');
+					clearInterval(autoInterval);
 					autoBtn.classList.remove('button2');
 				}else {
+					checkForAuto();
 					httpGet('AUTO1');
 					autoBtn.classList.add('button2');
 				}
@@ -135,15 +138,17 @@
 			});
 			
 			function checkForAuto(){
-				if(Number(temperature.textContent) >=Number(degrees.textContent)){
-					if(onBtn.textContent === 'ON') {
-						httpGet('OFF');
+				autoInterval = setInterval(()=>{
+					if(Number(temperature.textContent) >=Number(degrees.textContent)){
+						if(onBtn.textContent === 'ON') {
+							httpGet('OFF');
+						}
+					}else {
+						if(onBtn.textContent === 'OFF') {
+							httpGet('ON');
+						}
 					}
-				}else {
-					if(onBtn.textContent === 'OFF') {
-						httpGet('ON');
-					}
-				}
+				},15000);
 			}
 	</script>
 </html>
