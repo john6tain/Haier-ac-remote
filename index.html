@@ -33,7 +33,7 @@
 			<div style="padding-top: 5%;">
 				<em>Humidity: </em><b class="bar">60</b> <i>%</i>
 				<div class="counter2">
-					<em>Temp: </em><b class="bar">25</b><i>&#8451</i>
+					<em>Temp: </em><b class="bar">29 </b><i>&#8451</i>
 				</div>
 			</div>
 		</div>
@@ -80,6 +80,7 @@
 				
 				onBtn.textContent = buttonState.on && 'ON' || 'OFF';
 				buttonState.on ? onBtn.classList.remove('button2') : onBtn.classList.add('button2');
+				buttonState.auto ? autoBtn.classList.add('button2') : autoBtn.classList.remove('button2');
 			}
 			reloadState();
 			function httpGet(command, base){
@@ -105,15 +106,13 @@
 			
 			autoBtn.addEventListener('click', () => {
 				if (autoBtn.classList.contains('button2')) {
-			
 					httpGet('AUTO0');
-					checkForAuto();
 					autoBtn.classList.remove('button2');
 				}else {
-					checkForAuto();
 					httpGet('AUTO1');
 					autoBtn.classList.add('button2');
 				}
+				checkForAuto();
 			});
 			
 			plusBtn.addEventListener('click', () => {
@@ -152,7 +151,7 @@
 							onBtn.classList.add('button2');
 						}
 					}
-				},15000);
+				},150);
 			}
 	</script>
 </html>
