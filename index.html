@@ -78,7 +78,7 @@
 				humidity.textContent = `${buttonState.humidity}`;
 				temperature.textContent = `${buttonState.temperature}`;
 				
-				onBtn.textContent = buttonState.on && 'OFF' || 'ON';
+				onBtn.textContent = buttonState.on && 'ON' || 'oFF';
 				buttonState.on ? onBtn.classList.add('button2'): onBtn.classList.remove('button2');
 				buttonState.auto ? autoBtn.classList.add('button2') : autoBtn.classList.remove('button2');
 			}
@@ -94,12 +94,12 @@
 			
 			onBtn.addEventListener('click', () => {
 				if (onBtn.classList.contains('button2')) {
-					onBtn.textContent = ('ON');
+					onBtn.textContent = ('OFF');
 					httpGet('OFF');
 					onBtn.classList.remove('button2');
 				}else {
 					httpGet('ON');
-					onBtn.textContent = ('OFF');
+					onBtn.textContent = ('ON');
 					onBtn.classList.add('button2');
 				}
 			});
