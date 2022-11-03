@@ -16,9 +16,9 @@ let buttonState = {
 	fanSpeed: 'Auto',
 	modeType: 'Heat',
 	modeTypes: ['Auto','Cool','Heat','Dry','Fan'],
-	on:true,
-	humidity: 10,
-	temperature: 25,
+	on: false,
+	humidity: 100,
+	temperature: 100,
 	auto:false,
 }
 	
