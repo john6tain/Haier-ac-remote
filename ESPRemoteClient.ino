@@ -10,17 +10,93 @@
 
 #define DHTTYPE DHT11 
 
+class ButtonState {
+  private:
+    int degrees;
+    String fanSpeed;
+    String modeType;
+    bool on;
+    bool auto_mode;
+    float humidity;
+    float temperature;
+  public:
+  
+    ButtonState(int degrees, String fanSpeed, String modeType, bool on, bool auto_mode, float humidity, float temperature){
+      this->degrees = degrees;
+      this->fanSpeed = fanSpeed;
+      this->modeType = modeType;
+      this->on = on;
+      this->auto_mode = auto_mode;
+      this->humidity = humidity;
+      this->temperature = temperature;
+    }
+    
+    void set_degrees(int degrees){
+      this->degrees = degrees;
+    }
+    
+    void set_fanSpeed(String fanSpeed){
+      this->fanSpeed = fanSpeed;
+    }
+    
+    void set_modeType(String modeType){
+      this->modeType = modeType;
+    }
+    void set_on(bool on){
+      this->on = on;
+    }
+    
+    void set_auto(bool auto_mode){
+      this->auto_mode = auto_mode;
+    }
+    
+    void set_humidity(float humidity){
+      this->humidity = humidity;
+    }
+      
+    void set_temperature(float temperature){
+      this->temperature  = temperature;
+    }
+    
+    int get_degrees(){
+      return this->degrees;
+    }
+    
+    String get_fanSpeed(){
+      return this->fanSpeed;
+    }
+    
+    String get_modeType(){
+      return this->modeType;
+    }
+    bool get_on(){
+      return this->on;
+    }
+    
+    bool get_auto(){
+      return this->auto_mode;
+    }
+    
+    float get_humidity(){
+      return this->humidity;
+    }
+      
+    float get_temperature(){
+      return this->temperature;
+    }
+};
+
 
 IRac ac(4);
 
 // Replace with your network credentials
 const char* ssid     = "SSID";
-const char* password = "PASSWORD";
+const char* password = "PASS";
+String HOST = "URL";
 
 WiFiClientSecure client;
 HTTPClient http;
 
-int degrees = 25;
 String fanSpeed = "auto";
 String modeType = "Heat";
 
@@ -32,7 +108,10 @@ const int output4 = 4; // D2
 
 DHT dht(DHTPin, DHT11); 
 
+ButtonState buttonState(25,"Auto","Heat",false,false,100,100);
+
 void setupAC() {
+
   ac.next.protocol = decode_type_t::HAIER_AC;  // Set a protocol to use.
   ac.next.model = 2;  // Some A/Cs have different models. Try just the first.
   //  ac.next.mode = stdAc::opmode_t::kCool;  // Run in cool mode initially.
@@ -81,16 +160,20 @@ void checkResponse(String response) {
   }
   if (response == "ON") {
     ac.next.power = true;
+    buttonState.set_on(true);
     ac.sendAc();
   } else if (response == "OFF") {
+    buttonState.set_on(false);
     ac.next.power = false;
     ac.sendAc();
   } else if (response.indexOf("degrees:") > -1) {
     int degrees = response.substring(8, response.length()).toInt();
     ac.next.degrees = degrees;
+    buttonState.set_degrees(degrees);
     ac.sendAc();
   } else if (response.indexOf("MODE:") > -1) {
     String modeType = response.substring(5, response.length());
+    buttonState.set_modeType(modeType);
     if (modeType == "Cool") {
       ac.next.mode = stdAc::opmode_t::kCool;
     } else if (modeType == "Heat") {
@@ -105,7 +188,7 @@ void checkResponse(String response) {
     ac.sendAc();
   } else if (response.indexOf("FAN:") > -1) {
     String fanSpeed = response.substring(4, response.length());
-
+    buttonState.set_fanSpeed(fanSpeed);
     if (fanSpeed == "Min") {
       ac.next.fanspeed = stdAc::fanspeed_t::kMin;
     } else if (fanSpeed == "Low") {
@@ -153,19 +236,21 @@ String httpClient(String url){
 }
 
 
-void sendTempAndHumidity() {
+void sendButtonState() {
   float temperature;
   float humidity;
   temperature = dht.readTemperature(); // Gets the values of the temperature
   humidity = dht.readHumidity(); // Gets the values of the humidity 
-
-  httpClient("https://localhost/get/sensors/"+String(temperature)+"/"+String(humidity));
+  
+  buttonState.set_temperature(temperature);
+  buttonState.set_humidity(humidity);
+  httpClient(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+String(buttonState.get_on())+"/"+String(buttonState.get_auto())+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
 
 }
 
 void loop() {
     client.setInsecure(); //the magic line, use with caution
-    client.connect("https://localhost", 443);
-    checkResponse(httpClient("https://localhost/get/command"));
-    sendTempAndHumidity();
+    client.connect(HOST+"", 443);
+    checkResponse(httpClient(HOST+"/get/command"));
+    sendButtonState();
 }

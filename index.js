@@ -38,10 +38,15 @@ app.get('/send/:command',(req,res)=>{
 	return res.send("command send!");
 });
 
-app.get('/get/sensors/:temperature/:humidity',(req,res)=>{
+app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:temperature',(req,res)=>{
+	buttonState.degrees = Number(req.params.degrees);
+	buttonState.fanSpeed = req.params.fanSpeed;
+	buttonState.modeType = req.params.modeType;
+	buttonState.on = req.params.on === 'true';
+	buttonState.auto = req.params.auto === 'true';
 	buttonState.temperature = req.params.temperature;
 	buttonState.humidity = req.params.humidity;
-	return res.send("sensors OK!");
+	return res.send("Button states OK!");
 });
 
 app.get('/get/command',(req,res)=>{
