@@ -78,8 +78,8 @@
 				humidity.textContent = `${buttonState.humidity}`;
 				temperature.textContent = `${buttonState.temperature}`;
 				
-				onBtn.textContent = buttonState.on && 'ON' || 'OFF';
-				buttonState.on ? onBtn.classList.remove('button2') : onBtn.classList.add('button2');
+				onBtn.textContent = buttonState.on && 'OFF' || 'ON';
+				buttonState.on ? onBtn.classList.add('button2'): onBtn.classList.remove('button2');
 				buttonState.auto ? autoBtn.classList.add('button2') : autoBtn.classList.remove('button2');
 			}
 			reloadState();

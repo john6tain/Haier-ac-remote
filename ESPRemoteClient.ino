@@ -108,7 +108,7 @@ const int output4 = 4; // D2
 
 DHT dht(DHTPin, DHT11); 
 
-ButtonState buttonState(25,"Auto","Heat",false,false,100,100);
+ButtonState buttonState(25,"Auto","Heat",true,false,100,100);
 
 void setupAC() {
 
