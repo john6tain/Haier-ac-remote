@@ -69,11 +69,11 @@ function checkState(state){
 			buttonState.auto = false;
 		break;
 		case "ON":
-			buttonState.on = false;
+			buttonState.on = true;
 			response = 'ON';
 		break;
 		case "OFF":
-			buttonState.on = true;
+			buttonState.on = false;
 			response = 'OFF';
 		break;
 		case "+":
