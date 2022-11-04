@@ -64,9 +64,11 @@ function checkState(state){
 	switch (state){
 		case "AUTO1":
 			buttonState.auto = true;
+			response: = `auto:ON`;
 		break;
 		case "AUTO0":
 			buttonState.auto = false;
+			response: = `auto:OFF`;
 		break;
 		case "ON":
 			buttonState.on = true;

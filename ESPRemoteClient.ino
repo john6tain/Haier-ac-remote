@@ -92,7 +92,7 @@ IRac ac(4);
 // Replace with your network credentials
 const char* ssid     = "SSID";
 const char* password = "PASS";
-String HOST = "URL";
+String HOST = "https://URL";
 
 WiFiClientSecure client;
 HTTPClient http;
@@ -108,7 +108,7 @@ const int output4 = 4; // D2
 
 DHT dht(DHTPin, DHT11); 
 
-ButtonState buttonState(25,"Auto","Heat",true,false,100,100);
+ButtonState buttonState(25,"Auto","Heat",false,false,100,100);
 
 void setupAC() {
 
@@ -166,7 +166,10 @@ void checkResponse(String response) {
     buttonState.set_on(false);
     ac.next.power = false;
     ac.sendAc();
-  } else if (response.indexOf("degrees:") > -1) {
+  } else if (response.indexOf("auto:") > -1) {
+    String auto_state = response.substring(5, response.length());
+    buttonState.set_auto(auto_state == "ON");
+  }else if (response.indexOf("degrees:") > -1) {
     int degrees = response.substring(8, response.length()).toInt();
     ac.next.degrees = degrees;
     buttonState.set_degrees(degrees);
@@ -244,7 +247,7 @@ void sendButtonState() {
   
   buttonState.set_temperature(temperature);
   buttonState.set_humidity(humidity);
-  //Serial.println(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
+  // Serial.println(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
 
   httpClient(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
 
