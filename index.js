@@ -33,8 +33,8 @@ app.get('/get/state',(req,res)=>{
 });
 
 app.get('/send/min-max/:minTemperature/:maxTemperature',(req,res)=>{
-	buttonState.minTemperature = req.params.minTemperature;
-	buttonState.maxTemperature = req.params.maxTemperature;
+	buttonState.minTemperature = Number(req.params.minTemperature);
+	buttonState.maxTemperature = Number(req.params.maxTemperature);
 	return res.send("min-max send!");
 });
 

@@ -142,7 +142,7 @@
 			});
 			
 			function checkForAuto(){
-				minTemperature = Number(prompt(`Enter max temerature (default ${minTemperature}): `));
+				minTemperature = Number(prompt(`Enter min temerature (default ${minTemperature}): `));
 				maxTemperature = Number(prompt(`Enter max temerature (default ${maxTemperature}): `));
 				
 				httpGet('',`/send/min-max/${minTemperature}/${maxTemperature}`);
