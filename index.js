@@ -19,7 +19,9 @@ let buttonState = {
 	on: false,
 	humidity: 100,
 	temperature: 100,
-	auto:false,
+	auto: false,
+	maxTemperature: 22,
+	minTemperature: 19
 }
 	
 
@@ -30,11 +32,14 @@ app.get('/get/state',(req,res)=>{
 	return res.json(buttonState);
 });
 
+app.get('/send/min-max/:minTemperature/:maxTemperature',(req,res)=>{
+	buttonState.minTemperature = req.params.minTemperature;
+	buttonState.maxTemperature = req.params.maxTemperature;
+	return res.send("min-max send!");
+});
 
 app.get('/send/:command',(req,res)=>{
 	checkState(req.params.command)
-	//console.log(req.params.command);
-	//console.log(response);
 	return res.send("command send!");
 });
 

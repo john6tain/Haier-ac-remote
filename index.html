@@ -67,6 +67,9 @@
 			const modeType = document.querySelectorAll('.bar')[1];
 			const humidity = document.querySelectorAll('.bar')[2];
 			const temperature = document.querySelectorAll('.bar')[3];
+			const minTemperature = 19;
+			const maxTemperature = 22;
+		
 			let autoInterval;
 			
 			function reloadState(){
@@ -77,6 +80,8 @@
 				modeType.textContent = buttonState.modeType;
 				humidity.textContent = `${buttonState.humidity}`;
 				temperature.textContent = `${buttonState.temperature}`;
+				minTemperature = buttonState.minTemperature;
+				maxTemperature = buttonState.maxTemperature;
 				
 				onBtn.textContent = buttonState.on && 'OFF' || 'ON';
 				buttonState.on ? onBtn.classList.add('button2'): onBtn.classList.remove('button2');
@@ -137,15 +142,20 @@
 			});
 			
 			function checkForAuto(){
+				minTemperature = Number(prompt(`Enter max temerature (default ${minTemperature}): `));
+				maxTemperature = Number(prompt(`Enter max temerature (default ${maxTemperature}): `));
+				
+				httpGet('',`/send/min-max/${minTemperature}/${maxTemperature}`);
+				
 				autoInterval = setInterval(()=>{
-					if(Number(temperature.textContent) >=Number(22)){
+					if(Number(temperature.textContent) >=Number(maxTemperature)){
 						
 						if(onBtn.textContent === 'OFF') {
 							httpGet('OFF');
 							onBtn.textContent = ('ON');
 							onBtn.classList.remove('button2');
 						}
-					}else {
+					} else if (Number(temperature.textContent) <=Number(minTemperature)){
 						if(onBtn.textContent === 'ON') {
 							httpGet('ON');
 							onBtn.textContent = ('OFF');
