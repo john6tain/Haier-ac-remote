@@ -19,9 +19,12 @@ class ButtonState {
     bool auto_mode;
     float humidity;
     float temperature;
+    float minTemperature;
+    float maxTemperature;
   public:
   
-    ButtonState(int degrees, String fanSpeed, String modeType, bool on, bool auto_mode, float humidity, float temperature){
+    ButtonState(int degrees, String fanSpeed, String modeType,bool on,bool auto_mode,
+				float humidity, float temperature,float minTemperature,float maxTemperature){
       this->degrees = degrees;
       this->fanSpeed = fanSpeed;
       this->modeType = modeType;
@@ -29,6 +32,8 @@ class ButtonState {
       this->auto_mode = auto_mode;
       this->humidity = humidity;
       this->temperature = temperature;
+      this->minTemperature = minTemperature;
+      this->maxTemperature = maxTemperature;
     }
     
     void set_degrees(int degrees){
@@ -57,6 +62,14 @@ class ButtonState {
     void set_temperature(float temperature){
       this->temperature  = temperature;
     }
+	
+	void set_maxTemperature(float maxTemperature){
+      this->maxTemperature  = maxTemperature;
+    }
+	
+	void set_minTemperature(float minTemperature){
+      this->minTemperature  = minTemperature;
+    }
     
     int get_degrees(){
       return this->degrees;
@@ -84,6 +97,14 @@ class ButtonState {
     float get_temperature(){
       return this->temperature;
     }
+	
+	float get_minTemperature(){
+      return this->minTemperature;
+    }
+	
+	float get_maxTemperature(){
+      return this->get_maxTemperature;
+    }
 };
 
 
@@ -108,7 +129,7 @@ const int output4 = 4; // D2
 
 DHT dht(DHTPin, DHT11); 
 
-ButtonState buttonState(25,"Auto","Heat",false,false,100,100);
+ButtonState buttonState(25,"Auto","Heat",false,false,100,100,19,22);
 
 void setupAC() {
 
@@ -169,10 +190,17 @@ void checkResponse(String response) {
   } else if (response.indexOf("auto:") > -1) {
     String auto_state = response.substring(5, response.length());
     buttonState.set_auto(auto_state == "ON");
-  }else if (response.indexOf("degrees:") > -1) {
+  } else if (response.indexOf("degrees:") > -1) {
     int degrees = response.substring(8, response.length()).toInt();
     ac.next.degrees = degrees;
     buttonState.set_degrees(degrees);
+    ac.sendAc();
+  } else if (response.indexOf("min-max:") > -1) {
+    float min = response.substring(8, response.indexOf('-')).toFloat();
+    float max = response.substring(response.indexOf('-'), response.length()).toFloat();
+
+    buttonState.set_minTemperature(min);
+    buttonState.set_maxTemperature(max);
     ac.sendAc();
   } else if (response.indexOf("MODE:") > -1) {
     String modeType = response.substring(5, response.length());
@@ -238,6 +266,21 @@ String httpClient(String url){
   
 }
 
+void setAuto(){
+	if(buttonState.get_auto()){
+		if(Number(buttonState.get_temperature()) >=Number(buttonState.get_maxTemperature())){
+			if(buttonState.get_on()) {
+				buttonState.set_on(false);
+				response = 'OFF';
+			}
+		} else if (Number(buttonState.get_temperature()) <=Number(buttonState.get_minTemperature())){	
+			if(!buttonState.get_on() {
+				buttonState.set_on(true);
+			}
+		}
+	}
+}
+
 
 void sendButtonState() {
   float temperature;
@@ -247,9 +290,8 @@ void sendButtonState() {
   
   buttonState.set_temperature(temperature);
   buttonState.set_humidity(humidity);
-  // Serial.println(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
 
-  httpClient(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature()));
+  httpClient(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature())+"/"+String(buttonState.get_minTemperature())+"/"+String(buttonState.get_maxTemperature()));
 
 }
 
@@ -258,4 +300,5 @@ void loop() {
     client.connect(HOST+"", 443);
     checkResponse(httpClient(HOST+"/get/command"));
     sendButtonState();
+	setAuto();
 }

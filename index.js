@@ -35,6 +35,7 @@ app.get('/get/state',(req,res)=>{
 app.get('/send/min-max/:minTemperature/:maxTemperature',(req,res)=>{
 	buttonState.minTemperature = Number(req.params.minTemperature);
 	buttonState.maxTemperature = Number(req.params.maxTemperature);
+	response = `min-max:${buttonState.minTemperature}-${buttonState.maxTemperature}`;
 	return res.send("min-max send!");
 });
 
@@ -43,7 +44,7 @@ app.get('/send/:command',(req,res)=>{
 	return res.send("command send!");
 });
 
-app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:temperature',(req,res)=>{
+app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:temperature/:minTemperature/:maxTemperature',(req,res)=>{
 	buttonState.degrees = Number(req.params.degrees);
 	buttonState.fanSpeed = req.params.fanSpeed;
 	buttonState.modeType = req.params.modeType;
@@ -51,6 +52,8 @@ app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:tem
 	buttonState.auto = req.params.auto === 'true';
 	buttonState.temperature = req.params.temperature;
 	buttonState.humidity = req.params.humidity;
+	buttonState.minTemperature = req.params.minTemperature;
+	buttonState.maxTemperature = req.params.maxTemperature;
 	return res.send("Button states OK!");
 });
 
@@ -65,29 +68,11 @@ app.get('/',(req,res)=>{
 	return res.sendFile(index);
 });
 
-			
-function setAuto(){
-	clearInterval(autoInterval);
-	autoInterval = setInterval(()=>{
-		if(Number(buttonState.temperature) >=Number(buttonState.maxTemperature)){
-			if(buttonState.on) {
-				buttonState.on = false;
-				response = 'OFF';
-			}
-		} else if (Number(buttonState.temperature) <=Number(buttonState.minTemperature)){	
-			if(!buttonState.on) {
-				buttonState.on = true;
-				response = 'ON';
-			}
-		}
-		},15000);
-}
 
 function checkState(state){
 	switch (state){
 		case "AUTO1":
 			buttonState.auto = true;
-			setAuto();
 			response = `auto:ON`;
 		break;
 		case "AUTO0":
