@@ -103,7 +103,7 @@ class ButtonState {
     }
 	
 	float get_maxTemperature(){
-      return this->get_maxTemperature;
+      return this->maxTemperature;
     }
 };
 
@@ -268,13 +268,12 @@ String httpClient(String url){
 
 void setAuto(){
 	if(buttonState.get_auto()){
-		if(Number(buttonState.get_temperature()) >=Number(buttonState.get_maxTemperature())){
+		if(buttonState.get_temperature() >=buttonState.get_maxTemperature()){
 			if(buttonState.get_on()) {
 				buttonState.set_on(false);
-				response = 'OFF';
 			}
-		} else if (Number(buttonState.get_temperature()) <=Number(buttonState.get_minTemperature())){	
-			if(!buttonState.get_on() {
+		} else if (buttonState.get_temperature() <=buttonState.get_minTemperature()){	
+			if(!buttonState.get_on()) {
 				buttonState.set_on(true);
 			}
 		}

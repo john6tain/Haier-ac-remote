@@ -36,6 +36,12 @@
 					<em>Temp: </em><b class="bar">29 </b><i>&#8451</i>
 				</div>
 			</div>
+			<div style="padding-top: 5%;font-size: 12px;display:none;" id="autoCounters">
+				<em>min Temp: </em><b class="bar">29 </b><i>&#8451</i>
+				<div class="counter2" style="padding-left: 30%;">
+					<em>max Temp: </em><b class="bar">29 </b><i>&#8451</i>
+				</div>
+			</div>
 		</div>
 		<div class="row">
 			<button id="modeBtn" class="button">MODE</button>
@@ -67,8 +73,8 @@
 			const modeType = document.querySelectorAll('.bar')[1];
 			const humidity = document.querySelectorAll('.bar')[2];
 			const temperature = document.querySelectorAll('.bar')[3];
-			let minTemperature = 19;
-			let maxTemperature = 22;
+			const minTemperature = document.querySelectorAll('.bar')[4];
+			const maxTemperature = document.querySelectorAll('.bar')[5];
 		
 			let autoInterval;
 			
@@ -81,12 +87,13 @@
 				modeType.textContent = buttonState.modeType;
 				humidity.textContent = `${buttonState.humidity}`;
 				temperature.textContent = `${buttonState.temperature}`;
-				minTemperature = buttonState.minTemperature;
-				maxTemperature = buttonState.maxTemperature;
+				minTemperature.textContent = buttonState.minTemperature;
+				maxTemperature.textContent = buttonState.maxTemperature;
 				
 				onBtn.textContent = buttonState.on && 'OFF' || 'ON';
 				buttonState.on ? onBtn.classList.add('button2'): onBtn.classList.remove('button2');
 				buttonState.auto ? autoBtn.classList.add('button2') : autoBtn.classList.remove('button2');
+				buttonState.auto ? document.querySelector('#autoCounters').style.display = 'block' : document.querySelector('#autoCounters').style.display = 'none';
 			}
 			reloadState();
 			function httpGet(command, base){
@@ -114,6 +121,7 @@
 					httpGet('AUTO0');
 					clearInterval(autoInterval);
 					autoBtn.classList.remove('button2');
+					document.querySelector('#autoCounters').style.display = 'none';
 				}else {
 					httpGet('AUTO1');
 					checkForAuto();
@@ -142,10 +150,11 @@
 			});
 			
 			function checkForAuto(){
-				minTemperature = Number(prompt(`Enter min temerature (default ${minTemperature}): `));
-				maxTemperature = Number(prompt(`Enter max temerature (default ${maxTemperature}): `));
+				minTemperature.textContent = Number(prompt(`Enter min temerature (default ${minTemperature.textContent}): `));
+				maxTemperature.textContent = Number(prompt(`Enter max temerature (default ${maxTemperature.textContent}): `));
 				
 				httpGet('',`/send/min-max/${minTemperature}/${maxTemperature}`);
+				buttonState.auto ? document.querySelector('#autoCounters').style.display = 'block' : document.querySelector('#autoCounters').style.display = 'none';
 				
 			}
 	</script>
