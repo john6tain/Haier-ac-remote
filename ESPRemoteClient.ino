@@ -195,10 +195,11 @@ void checkResponse(String response) {
     ac.next.degrees = degrees;
     buttonState.set_degrees(degrees);
     ac.sendAc();
-  } else if (response.indexOf("min-max:") > -1) {
+  } else if (response.indexOf("min_max:") > -1) {
     float min = response.substring(8, response.indexOf('-')).toFloat();
     float max = response.substring(response.indexOf('-'), response.length()).toFloat();
-
+    Serial.println(response.substring(8, response.indexOf('-')));
+    Serial.println(response.substring(response.indexOf('-'), response.length()));
     buttonState.set_minTemperature(min);
     buttonState.set_maxTemperature(max);
     ac.sendAc();
