@@ -70,18 +70,16 @@ function setAuto(){
 	clearInterval(autoInterval);
 	autoInterval = setInterval(()=>{
 		if(Number(buttonState.temperature) >=Number(buttonState.maxTemperature)){
-				
-			if(!buttonState.on) {
-				buttonState.on = true;
-				response = 'ON';
-			}
-		} else if (Number(buttonState.temperature) <=Number(buttonState.minTemperature)){
 			if(buttonState.on) {
 				buttonState.on = false;
 				response = 'OFF';
 			}
+		} else if (Number(buttonState.temperature) <=Number(buttonState.minTemperature)){	
+			if(!buttonState.on) {
+				buttonState.on = true;
+				response = 'ON';
+			}
 		}
-			reloadState();
 		},15000);
 }
 
