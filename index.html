@@ -153,7 +153,7 @@
 				minTemperature.textContent = Number(prompt(`Enter min temerature (default ${minTemperature.textContent}): `));
 				maxTemperature.textContent = Number(prompt(`Enter max temerature (default ${maxTemperature.textContent}): `));
 				
-				httpGet('',`/send/min-max/${minTemperature}/${maxTemperature}`);
+				httpGet('',`/send/min-max/${minTemperature.textContent}/${maxTemperature.textContent}`);
 				buttonState.auto ? document.querySelector('#autoCounters').style.display = 'block' : document.querySelector('#autoCounters').style.display = 'none';
 				
 			}
