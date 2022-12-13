@@ -87,9 +87,6 @@
 				onBtn.textContent = buttonState.on && 'OFF' || 'ON';
 				buttonState.on ? onBtn.classList.add('button2'): onBtn.classList.remove('button2');
 				buttonState.auto ? autoBtn.classList.add('button2') : autoBtn.classList.remove('button2');
-				if(buttonState.auto){
-					setAuto();
-				}
 			}
 			reloadState();
 			function httpGet(command, base){
@@ -98,28 +95,6 @@
 					xmlHttp.open( "GET", baseUrl, false ); // false for synchronous request
 					xmlHttp.send();
 					return xmlHttp.responseText;
-			}
-			
-						
-			function setAuto(){
-				clearInterval(autoInterval);
-				autoInterval = setInterval(()=>{
-						if(Number(temperature.textContent) >=Number(maxTemperature)){
-							
-							if(onBtn.textContent === 'OFF') {
-								httpGet('OFF');
-								onBtn.textContent = ('ON');
-								onBtn.classList.remove('button2');
-							}
-						} else if (Number(temperature.textContent) <=Number(minTemperature)){
-							if(onBtn.textContent === 'ON') {
-								httpGet('ON');
-								onBtn.textContent = ('OFF');
-								onBtn.classList.add('button2');
-							}
-						}
-						reloadState();
-					},15000);
 			}
 			
 			onBtn.addEventListener('click', () => {
@@ -171,7 +146,6 @@
 				maxTemperature = Number(prompt(`Enter max temerature (default ${maxTemperature}): `));
 				
 				httpGet('',`/send/min-max/${minTemperature}/${maxTemperature}`);
-				setAuto();
 				
 			}
 	</script>

@@ -24,7 +24,7 @@ let buttonState = {
 	minTemperature: 19
 }
 	
-
+let autoInterval;
 let response="";
 
 app.get('/get/state',(req,res)=>{
@@ -65,10 +65,31 @@ app.get('/',(req,res)=>{
 	return res.sendFile(index);
 });
 
+			
+function setAuto(){
+	clearInterval(autoInterval);
+	autoInterval = setInterval(()=>{
+		if(Number(buttonState.temperature) >=Number(buttonState.maxTemperature)){
+				
+			if(!buttonState.on) {
+				buttonState.on = true;
+				response = 'ON';
+			}
+		} else if (Number(buttonState.temperature) <=Number(buttonState.minTemperature)){
+			if(buttonState.on) {
+				buttonState.on = false;
+				response = 'OFF';
+			}
+		}
+			reloadState();
+		},15000);
+}
+
 function checkState(state){
 	switch (state){
 		case "AUTO1":
 			buttonState.auto = true;
+			setAuto();
 			response = `auto:ON`;
 		break;
 		case "AUTO0":
