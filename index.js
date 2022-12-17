@@ -107,6 +107,9 @@ function checkState(state){
 			buttonState.fanSpeed = buttonState.fanSpeeds[(buttonState.fanSpeeds.indexOf(buttonState.fanSpeed)+1 )% buttonState.fanSpeeds.length];
 		response = `FAN:${buttonState.fanSpeed}`;
 		break;
+		case "MOISTURE":
+			response = `MOISTURE`;
+		break;
 		
 	}
 }
