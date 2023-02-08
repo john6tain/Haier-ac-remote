@@ -9,7 +9,7 @@ app.listen(port, function(){
   console.log(`Listening on port! ${port}`)
 });
 
-
+let log = "";
 let buttonState = {
 	degrees: 25,
 	fanSpeeds: ['Auto','Min','Low','Medium','High','Max'],
@@ -21,7 +21,7 @@ let buttonState = {
 	temperature: 100,
 	auto: false,
 	maxTemperature: 22,
-	minTemperature: 19
+	minTemperature: 19,
 }
 	
 let autoInterval;
@@ -42,6 +42,15 @@ app.get('/send/min-max/:minTemperature/:maxTemperature',(req,res)=>{
 app.get('/send/:command',(req,res)=>{
 	checkState(req.params.command)
 	return res.send("command send!");
+});
+
+app.get('/send/logger/:log',(req,res)=>{
+	log = req.params.log
+	return res.send("log send!");
+});
+
+app.get('/get/logger',(req,res)=>{
+	return res.send(log);
 });
 
 app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:temperature/:minTemperature/:maxTemperature',(req,res)=>{
@@ -110,6 +119,9 @@ function checkState(state){
 		case "MOISTURE":
 			response = `MOISTURE`;
 		break;
+		default:
+			response = state;
+		break;	
 		
 	}
 }
