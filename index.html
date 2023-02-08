@@ -59,6 +59,12 @@
 		<div class="row">
 			<button id="autoBtn" class="button exdend">Auto</button>
 		</div>
+		<div class="row">
+			<button id="logBtn" class="button exdend">LOG</button>
+		</div>
+		<div class="row">
+			<button id="restartBtn" class="button exdend">RESTART</button>
+		</div>
 	<div>
 </body>
 	<script>
@@ -149,6 +155,15 @@
 				reloadState();
 			});
 			
+			logBtn.addEventListener('click', () => {
+				httpGet('','/send/LOG');
+				  window.open(`${window.location.origin}/get/logger`, "_blank");
+			});
+			
+			restartBtn.addEventListener('click', () => {
+				httpGet('','/send/RESTART');
+				reloadState();
+			});
 			function checkForAuto(){
 				minTemperature.textContent = Number(prompt(`Enter min temerature (default ${minTemperature.textContent}): `));
 				maxTemperature.textContent = Number(prompt(`Enter max temerature (default ${maxTemperature.textContent}): `));
@@ -157,5 +172,7 @@
 				buttonState.auto ? document.querySelector('#autoCounters').style.display = 'block' : document.querySelector('#autoCounters').style.display = 'none';
 				
 			}
+			
+			restartBtn
 	</script>
 </html>
