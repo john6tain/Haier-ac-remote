@@ -10,6 +10,7 @@ app.listen(port, function(){
 });
 
 let log = "";
+let clientIP = ""
 let buttonState = {
 	degrees: 25,
 	fanSpeeds: ['Auto','Min','Low','Medium','High','Max'],
@@ -63,7 +64,12 @@ app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:tem
 	buttonState.humidity = req.params.humidity;
 	buttonState.minTemperature = req.params.minTemperature;
 	buttonState.maxTemperature = req.params.maxTemperature;
+	clientIP = req.socket.remoteAddress;
 	return res.send("Button states OK!");
+});
+
+app.get('/get/ip',(req,res)=>{
+	return res.send(clientIP);
 });
 
 app.get('/get/command',(req,res)=>{
