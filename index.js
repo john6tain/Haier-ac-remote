@@ -64,7 +64,7 @@ app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:tem
 	buttonState.humidity = req.params.humidity;
 	buttonState.minTemperature = req.params.minTemperature;
 	buttonState.maxTemperature = req.params.maxTemperature;
-	clientIP = req.socket.remoteAddress;
+	clientIP = req.header('x-forwarded-for') ||  req.socket.remoteAddress;
 	return res.send("Button states OK!");
 });
 
