@@ -69,6 +69,7 @@ app.get('/get/button/state/:degrees/:fanSpeed/:modeType/:on/:auto/:humidity/:tem
 });
 
 app.get('/get/ip',(req,res)=>{
+	checkState('WAKEME');
 	return res.send(clientIP);
 });
 
@@ -124,6 +125,9 @@ function checkState(state){
 		break;
 		case "MOISTURE":
 			response = `MOISTURE`;
+		break;
+		case "WAKEME":
+			response = `WAKEME`;
 		break;
 		default:
 			response = state;
