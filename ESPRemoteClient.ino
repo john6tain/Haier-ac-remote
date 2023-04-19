@@ -6,6 +6,12 @@
 #include <IRutils.h>
 #include <WiFiClientSecure.h>
 #include "DHT.h"
+#include <WiFiUdp.h>
+#include <WakeOnLan.h>
+WiFiUDP UDP;
+WakeOnLan WOL(UDP);
+#define TWELVE_HRS 43200000UL
+unsigned long startTime;
 
 
 #define DHTTYPE DHT11 
@@ -22,7 +28,7 @@ class ButtonState {
     float minTemperature;
     float maxTemperature;
   public:
-  
+    
     ButtonState(int degrees, String fanSpeed, String modeType,bool on,bool auto_mode,
 				float humidity, float temperature,float minTemperature,float maxTemperature){
       this->degrees = degrees;
@@ -107,6 +113,23 @@ class ButtonState {
     }
 };
 
+class Logger {
+  private:
+    String logger_value;
+  public:
+    Logger(){
+      this->logger_value = "";
+    }
+    void print_log(String value){
+      this->logger_value += "<div>";
+      this->logger_value += value;
+      this->logger_value += "</div>";
+    }
+    String get_log(){
+      return this->logger_value;
+    }
+  
+};
 
 IRac ac(4);
 
@@ -124,12 +147,15 @@ String modeType = "Heat";
 
 const int DHTPin = 14; // D5
 const int output4 = 4; // D2
-
+const int output5 = 5; // D1
 //uint8_t DHTPin = D5; 
+
+
 
 DHT dht(DHTPin, DHT11); 
 
 ButtonState buttonState(25,"Auto","Heat",false,false,100,100,19,22);
+Logger logger;
 
 void setupAC() {
 
@@ -154,56 +180,123 @@ void setupAC() {
   ac.next.power = false;  // Initially start with the unit off.
 
 }
+
+
 void setup() {
+
   Serial.begin(115200);
   pinMode(DHTPin, INPUT);
+  pinMode(output5, OUTPUT);
   setupAC();
   dht.begin();   
+//  pinMode(output5, OUTPUT);
+//  pinMode(12, OUTPUT);
   
   Serial.print("Connecting to ");
+  logger.print_log("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    logger.print_log(".");
   }
   // Print local IP address and start web server
   Serial.println("");
+  logger.print_log("");
   Serial.println("WiFi connected.");
+  logger.print_log("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
   Serial.println(WiFi.macAddress());
+  WOL.setRepeat(3, 100);
+  IPAddress pc_ip(192, 168, 1, 1); // your pc IPADRESS
+  WOL.setBroadcastAddress(pc_ip);
+  startTime = millis();
+  
+}
+
+String urlencode(String str)
+{
+    String encodedString="";
+    char c;
+    char code0;
+    char code1;
+    char code2;
+    for (int i =0; i < str.length(); i++){
+      c=str.charAt(i);
+      if (c == ' '){
+        encodedString+= '+';
+      } else if (isalnum(c)){
+        encodedString+=c;
+      } else{
+        code1=(c & 0xf)+'0';
+        if ((c & 0xf) >9){
+            code1=(c & 0xf) - 10 + 'A';
+        }
+        c=(c>>4)&0xf;
+        code0=c+'0';
+        if (c > 9){
+            code0=c - 10 + 'A';
+        }
+        code2='\0';
+        encodedString+='%';
+        encodedString+=code0;
+        encodedString+=code1;
+        //encodedString+=code2;
+      }
+      yield();
+    }
+    return encodedString;
+    
+}
+
+void wakePC(){
+  const char *MACAddress = "PC_MAC_ADDRESS_HERE";
+  WOL.sendMagicPacket(MACAddress);
+  Serial.println("WOKEEN");
 }
 
 void checkResponse(String response) {
   if (response.length() > 2) {
     Serial.println(response);
+    logger.print_log(response);
+  }
+  if(response == "RESTART"){
+      Serial.println("RST");
+      ESP.restart();
+  } else if(response == "LOG"){
+     Serial.println("logging ...");
+      Serial.println(logger.get_log());
+    httpClient(HOST+"/send/logger/"+urlencode(logger.get_log()));
   }
   if (response == "ON") {
     ac.next.power = true;
     buttonState.set_on(true);
     ac.sendAc();
-  } else if (response == "OFF") {
+  }
+  if (response == "OFF") {
     buttonState.set_on(false);
     ac.next.power = false;
     ac.sendAc();
-  } else if (response.indexOf("auto:") > -1) {
+  }
+  if (response.indexOf("auto:") > -1) {
     String auto_state = response.substring(5, response.length());
     buttonState.set_auto(auto_state == "ON");
-  } else if (response.indexOf("degrees:") > -1) {
+  }
+  if (response.indexOf("degrees:") > -1) {
     int degrees = response.substring(8, response.length()).toInt();
     ac.next.degrees = degrees;
     buttonState.set_degrees(degrees);
     ac.sendAc();
-  } else if (response.indexOf("min_max:") > -1) {
+  }
+  if (response.indexOf("min_max:") > -1) {
     float min = response.substring(8, response.indexOf('-')).toFloat();
-    float max = response.substring(response.indexOf('-'), response.length()).toFloat();
-    Serial.println(response.substring(8, response.indexOf('-')));
-    Serial.println(response.substring(response.indexOf('-'), response.length()));
+    float max = response.substring(response.indexOf('-')+1, response.length()).toFloat();
     buttonState.set_minTemperature(min);
     buttonState.set_maxTemperature(max);
-    ac.sendAc();
-  } else if (response.indexOf("MODE:") > -1) {
+  }
+  if (response.indexOf("MODE:") > -1) {
     String modeType = response.substring(5, response.length());
     buttonState.set_modeType(modeType);
     if (modeType == "Cool") {
@@ -218,7 +311,8 @@ void checkResponse(String response) {
       ac.next.mode = stdAc::opmode_t::kAuto;
     }
     ac.sendAc();
-  } else if (response.indexOf("FAN:") > -1) {
+  }
+  if (response.indexOf("FAN:") > -1) {
     String fanSpeed = response.substring(4, response.length());
     buttonState.set_fanSpeed(fanSpeed);
     if (fanSpeed == "Min") {
@@ -236,6 +330,15 @@ void checkResponse(String response) {
     }
     ac.sendAc();
   }
+  if(response.indexOf('MOISTURE')>-1){
+      digitalWrite(output5, HIGH);
+      delay(1000);
+      digitalWrite(output5, LOW);
+  }
+  if(response.indexOf('WAKEME')>-1){
+      wakePC();
+  }
+  
 
 }
 String httpClient(String url){
@@ -268,19 +371,22 @@ String httpClient(String url){
 }
 
 void setAuto(){
-	if(buttonState.get_auto()){
+	if(buttonState.get_auto() == 1){
 		if(buttonState.get_temperature() >=buttonState.get_maxTemperature()){
-			if(buttonState.get_on()) {
+			if(buttonState.get_on() == 1) {
 				buttonState.set_on(false);
+        ac.next.power = false;
+        ac.sendAc();
 			}
 		} else if (buttonState.get_temperature() <=buttonState.get_minTemperature()){	
-			if(!buttonState.get_on()) {
+			if(buttonState.get_on() == 0) {
 				buttonState.set_on(true);
+        ac.next.power = true;
+        ac.sendAc();
 			}
 		}
 	}
 }
-
 
 void sendButtonState() {
   float temperature;
@@ -294,11 +400,19 @@ void sendButtonState() {
   httpClient(HOST+"/get/button/state/"+String(buttonState.get_degrees())+"/"+String(buttonState.get_fanSpeed())+"/"+String(buttonState.get_modeType())+"/"+(buttonState.get_on() ? "true":"false" )+"/"+(buttonState.get_auto() ? "true":"false" )+"/"+String(buttonState.get_humidity())+"/"+String(buttonState.get_temperature())+"/"+String(buttonState.get_minTemperature())+"/"+String(buttonState.get_maxTemperature()));
 
 }
-
+void restartTimer(){
+  if (millis() - startTime > TWELVE_HRS)
+  {
+    // Put your code that runs every 12 hours here
+    ESP.restart();
+    startTime = millis();
+  }
+}
 void loop() {
     client.setInsecure(); //the magic line, use with caution
     client.connect(HOST+"", 443);
     checkResponse(httpClient(HOST+"/get/command"));
     sendButtonState();
-	setAuto();
+	  setAuto();  
+    
 }
